@@ -5,8 +5,8 @@ class NoteStorage:
     def __init__(self):
         self.store = JsonStore('notes.json')
     
-    def save_note(self, note_id, content, color, title="Untitled"):
-        self.store.put(note_id, content=content, color=color, timestamp=time.time(), title=title, pinned=False)
+    def save_note(self, note_id, content, color, title="Untitled", tags=None):
+        self.store.put(note_id, content=content, color=color, timestamp=time.time(), title=title, tags=tags or [], pinned=False)
     
     def delete_note(self, note_id):
         if note_id in self.store:

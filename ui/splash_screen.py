@@ -7,30 +7,28 @@ from kivy.graphics import Color, Rectangle
 class SplashScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Background
         with self.canvas.before:
-            Color(0.9, 0.9, 0.9, 1)  # Light grey
+            Color(0.9, 0.9, 0.9, 1)
             self.bg_rect = Rectangle(pos=self.pos, size=self.size)
         self.bind(pos=self.update_bg, size=self.update_bg)
 
-        # Logo (centered text)
         self.logo = Label(
             text="Q-NOTE",
             font_size=sp(48),
             color=(0, 0, 0, 1),
             bold=True,
-            pos_hint={'center_x': 0.5, 'center_y': 0.5},
             size_hint=(None, None),
-            size=(dp(200), dp(60))
+            size=(dp(200), dp(60)),
+            pos_hint={'center_x': 0.5, 'center_y': 0.5}
         )
         self.add_widget(self.logo)
         
-        # Transition after 2 seconds
-        Clock.schedule_once(self.switch_to_main, 2)
+        Clock.schedule_once(self.switch_to_main, 3)
 
     def update_bg(self, instance, value):
         self.bg_rect.pos = instance.pos
         self.bg_rect.size = instance.size
 
     def switch_to_main(self, dt):
-        self.manager.current = 'main'
+        if self.manager:
+            self.manager.current = 'main'

@@ -19,7 +19,7 @@ import os
 import webbrowser
 from urllib.parse import quote
 from kivy.clock import Clock
-from datetime import times
+from datetime import time
 
 COLORS = {
     "Coral": '#FF6F61',

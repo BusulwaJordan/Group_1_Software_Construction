@@ -1,5 +1,4 @@
 from kivy.uix.screenmanager import Screen
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.metrics import dp, sp
 from kivy.clock import Clock
@@ -14,24 +13,19 @@ class SplashScreen(Screen):
             self.bg_rect = Rectangle(pos=self.pos, size=self.size)
         self.bind(pos=self.update_bg, size=self.update_bg)
 
-        layout = BoxLayout(orientation='vertical', padding=dp(20))
-        
-        # Logo (simple text-based for now)
-        logo = Label(
+        # Logo (centered text)
+        self.logo = Label(
             text="Q-NOTE",
-            font_size=sp(48),  # Scalable font size
+            font_size=sp(48),
             color=(0, 0, 0, 1),
             bold=True,
-            size_hint=(1, 1),
-            halign='center',
-            valign='middle'
+            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            size_hint=(None, None),
+            size=(dp(200), dp(60))
         )
-        logo.bind(size=logo.setter('text_size'))
-        layout.add_widget(logo)
+        self.add_widget(self.logo)
         
-        self.add_widget(layout)
-        
-        # Transition to main screen after 2 seconds
+        # Transition after 2 seconds
         Clock.schedule_once(self.switch_to_main, 2)
 
     def update_bg(self, instance, value):

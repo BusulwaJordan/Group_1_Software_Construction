@@ -1,4 +1,4 @@
-from kivy.uix.screenmanager import Screen
+from kivy.uix.screen import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.textfield import MDTextField
@@ -15,11 +15,9 @@ from ui.slide_menu import SlideMenu
 from ui.note_tile import NoteTile
 from utils.storage import NoteStorage
 import random
-from kivy.core.audio import SoundLoader
 import os
 import webbrowser
 from urllib.parse import quote
-from datetime import time
 
 COLORS = {
     "Coral": '#FF6F61',
@@ -58,7 +56,7 @@ class MainScreen(Screen):
         
         main_layout = BoxLayout(orientation='vertical', padding=dp(10), spacing=dp(5))
         
-        # Header with menu, title, and settings
+        # Header
         header = BoxLayout(size_hint_y=None, height=dp(60), padding=dp(5))
         menu_btn = MDIconButton(
             icon="menu",
@@ -69,7 +67,7 @@ class MainScreen(Screen):
             on_press=self.toggle_menu
         )
         header.add_widget(menu_btn)
-        header.add_widget(Label(text="Q-NOTE", font_size=28, color=(0,0,0,1)))  # Updated app name
+        header.add_widget(Label(text="Q-NOTE", font_size=28, color=(0,0,0,1)))
         settings_btn = MDIconButton(
             icon="cog",
             md_bg_color=COLORS["Slate Blue"],
@@ -93,7 +91,7 @@ class MainScreen(Screen):
         )
         main_layout.add_widget(self.search_bar)
         
-        # Scrollable note area
+        # Scrollable notes
         self.scroll_view = ScrollView()
         self.notes_stack = KivyBoxLayout(orientation='vertical', spacing=dp(10), size_hint_y=None)
         self.notes_stack.bind(minimum_height=self.notes_stack.setter('height'))
@@ -128,7 +126,6 @@ class MainScreen(Screen):
             data = self.storage.store.get(key)
             content = data['content']
             title = data.get('title', 'Untitled')
-            # Search by title letters
             if not search_query or search_query.lower() in title.lower():
                 color = data.get('color', random.choice(list(COLORS.values())))
                 timestamp = data['timestamp']
@@ -155,66 +152,6 @@ class MainScreen(Screen):
             self.storage.store[key] = data
             self.storage.store.sync()
             self.load_notes()
-    
-    def add_image(self, instance):
-        file_popup = Popup(title="Select Image", size_hint=(0.9, 0.9))
-        file_chooser = FileChooserIconView()
-        select_button = MDIconButton(
-            icon="check",
-            size_hint_y=None,
-            height=dp(50),
-            md_bg_color=COLORS["Light Steel Blue"],
-            on_press=lambda x: self.embed_image(file_chooser.selection, file_popup)
-        )
-        popup_layout = BoxLayout(orientation='vertical')
-        popup_layout.add_widget(file_chooser)
-        popup_layout.add_widget(select_button)
-        file_popup.content = popup_layout
-        file_popup.open()
-    
-    def embed_image(self, selection, popup):
-        if selection:
-            img_path = selection[0]
-            note_id = str(time.time())
-            self.storage.save_image_note(note_id, img_path, random.choice(list(COLORS.values())))
-            self.load_notes()
-        popup.dismiss()
-    
-    def share_email(self, content):
-        try:
-            subject = "Note from Q-NOTE"
-            body = content
-            mailto_url = f"mailto:?subject={quote(subject)}&body={quote(body)}"
-            webbrowser.open(mailto_url)
-        except Exception as e:
-            Popup(title="Error", content=Label(text=f"Failed to open email client: {e}"),
-                  size_hint=(0.8, 0.4)).open()
-
-    def set_reminder(self, instance):
-        reminder_popup = Popup(title="Set Reminder", size_hint=(0.8, 0.4))
-        layout = BoxLayout(orientation='vertical')
-        from kivy.uix.textinput import TextInput
-        time_input = TextInput(hint_text="Time in minutes")
-        set_btn = MDIconButton(
-            icon="check",
-            md_bg_color=COLORS["Fern Green"],
-            on_press=lambda x: self.schedule_reminder(time_input.text, reminder_popup)
-        )
-        layout.add_widget(time_input)
-        layout.add_widget(set_btn)
-        reminder_popup.content = layout
-        reminder_popup.open()
-    
-    def schedule_reminder(self, minutes, popup):
-        from kivy.clock import Clock
-        try:
-            Clock.schedule_once(lambda dt: self.show_reminder_popup(), float(minutes) * 60)
-            popup.dismiss()
-        except ValueError:
-            Popup(title="Error", content=Label(text="Invalid time input"), size_hint=(0.8, 0.4)).open()
-    
-    def show_reminder_popup(self):
-        Popup(title="Reminder!", content=Label(text="Time's up!"), size_hint=(0.5, 0.3)).open()
     
     def go_to_note_input(self, instance):
         self.manager.current = 'note_input'

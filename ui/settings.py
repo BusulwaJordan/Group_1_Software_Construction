@@ -12,8 +12,8 @@ class SettingsScreen(Screen):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=dp(10), spacing=dp(10))
 
-        # Settings title
-        self.title_label = Label(
+        # Title
+        title_label = Label(
             text="Settings",
             font_size=36,
             color=(0, 0, 0, 1),
@@ -22,17 +22,10 @@ class SettingsScreen(Screen):
             halign='center',
             valign='middle'
         )
-        self.title_label.bind(size=self.title_label.setter('text_size'))
-        layout.add_widget(self.title_label)
+        layout.add_widget(title_label)
 
         # Theme selection
-        theme_layout = BoxLayout(
-            orientation='horizontal',
-            size_hint_y=None,
-            height=dp(40),
-            padding=[dp(20), 0, dp(20), 0],
-            spacing=dp(10)
-        )
+        theme_layout = BoxLayout(orientation='horizontal', size_hint_y=None, height=dp(40))
         theme_label = Label(text="Theme:", size_hint_x=None, width=dp(80))
         self.theme_button = MDButton(
             MDButtonText(text="Gray"),
@@ -49,7 +42,7 @@ class SettingsScreen(Screen):
         themes = ["Gray", "Blue", "Green", "Red", "Purple"]
         self.theme_menu = MDDropdownMenu(
             caller=self.theme_button,
-            items=[{"text": theme, "on_release": lambda x=theme: self.set_theme(x)} for theme in themes],
+            items=[{"text": t, "on_release": lambda x=t: self.set_theme(x)} for t in themes],
             width_mult=4,
             max_height=dp(200)
         )
@@ -67,7 +60,6 @@ class SettingsScreen(Screen):
         back_btn = MDButton(
             MDButtonText(text="Back"),
             style="elevated",
-            md_bg_color="#FF6F61",
             size_hint=(None, None),
             size=(dp(100), dp(40)),
             pos_hint={'center_x': 0.5},
@@ -85,10 +77,10 @@ class SettingsScreen(Screen):
         app = MDApp.get_running_app()
         app.theme_cls.primary_palette = theme
         app.theme_cls.primary_hue = "500"
-        # Update all widgets to reflect theme
+        # Update theme for buttons without overriding custom colors
         for screen in app.root.screens:
             for widget in screen.walk():
-                if hasattr(widget, 'md_bg_color') and widget.md_bg_color != [1, 0, 0, 1]:  # Exclude custom colors
+                if hasattr(widget, 'md_bg_color') and not widget.md_bg_color:
                     widget.md_bg_color = app.theme_cls.primary_color
         self.theme_menu.dismiss()
 

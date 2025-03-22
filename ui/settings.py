@@ -12,32 +12,32 @@ class SettingsScreen(Screen):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=dp(10), spacing=dp(10))
 
-        # Settings title at the top, larger font
+        # Settings title
         self.title_label = Label(
             text="Settings",
-            font_size=36,  # Increased from 28
+            font_size=36,
             color=(0, 0, 0, 1),
             size_hint_y=None,
             height=dp(60),
-            halign='center',  # Centered horizontally
+            halign='center',
             valign='middle'
         )
         self.title_label.bind(size=self.title_label.setter('text_size'))
         layout.add_widget(self.title_label)
 
-        # Theme selection, centered
+        # Theme selection
         theme_layout = BoxLayout(
             orientation='horizontal',
             size_hint_y=None,
             height=dp(40),
-            padding=[dp(20), 0, dp(20), 0],  # Center horizontally with padding
+            padding=[dp(20), 0, dp(20), 0],
             spacing=dp(10)
         )
         theme_label = Label(text="Theme:", size_hint_x=None, width=dp(80))
         self.theme_button = MDButton(
             MDButtonText(text="Gray"),
             size_hint=(None, None),
-            size=(dp(120), dp(35)),  # Slightly larger for visibility
+            size=(dp(120), dp(35)),
             pos_hint={'center_y': 0.5},
             on_release=self.open_theme_menu
         )
@@ -45,16 +45,11 @@ class SettingsScreen(Screen):
         theme_layout.add_widget(self.theme_button)
         layout.add_widget(theme_layout)
 
-        # Scrollable theme menu
+        # Theme menu
         themes = ["Gray", "Blue", "Green", "Red", "Purple"]
         self.theme_menu = MDDropdownMenu(
             caller=self.theme_button,
-            items=[
-                {
-                    "text": theme,
-                    "on_release": lambda x=theme: self.set_theme(x)
-                } for theme in themes
-            ],
+            items=[{"text": theme, "on_release": lambda x=theme: self.set_theme(x)} for theme in themes],
             width_mult=4,
             max_height=dp(200)
         )
@@ -86,13 +81,15 @@ class SettingsScreen(Screen):
         self.theme_menu.open()
 
     def set_theme(self, theme):
-        self.theme_button.children[0].text = theme  # Update button text
+        self.theme_button.children[0].text = theme
         app = MDApp.get_running_app()
         app.theme_cls.primary_palette = theme
         app.theme_cls.primary_hue = "500"
-        # Force theme update on all screens
+        # Update all widgets to reflect theme
         for screen in app.root.screens:
-            screen.canvas.ask_update()
+            for widget in screen.walk():
+                if hasattr(widget, 'md_bg_color') and widget.md_bg_color != [1, 0, 0, 1]:  # Exclude custom colors
+                    widget.md_bg_color = app.theme_cls.primary_color
         self.theme_menu.dismiss()
 
     def update_font_size(self, instance, value):

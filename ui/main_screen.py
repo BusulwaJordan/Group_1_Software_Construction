@@ -69,7 +69,7 @@ class MainScreen(Screen):
             on_press=self.toggle_menu
         )
         header.add_widget(menu_btn)
-        header.add_widget(Label(text="Q-NOTE", font_size=28, color=(0,0,0,1)))
+        header.add_widget(Label(text="Q-NOTE", font_size=28, color=(0,0,0,1)))  # Updated app name
         settings_btn = MDIconButton(
             icon="cog",
             md_bg_color=COLORS["Slate Blue"],
@@ -81,12 +81,12 @@ class MainScreen(Screen):
         header.add_widget(settings_btn)
         main_layout.add_widget(header)
         
-        # Search bar, reduced height
+        # Search bar
         self.search_bar = MDTextField(
             hint_text="Search notes...",
             size_hint=(None, None),
             width=dp(200),
-            height=dp(20),  # Reduced from dp(30)
+            height=dp(25),
             mode="outlined",
             pos_hint={'center_x': 0.5},
             on_text=self.filter_notes
@@ -128,7 +128,8 @@ class MainScreen(Screen):
             data = self.storage.store.get(key)
             content = data['content']
             title = data.get('title', 'Untitled')
-            if not search_query or search_query.lower() in title.lower() or search_query.lower() in content.lower():
+            # Search by title letters
+            if not search_query or search_query.lower() in title.lower():
                 color = data.get('color', random.choice(list(COLORS.values())))
                 timestamp = data['timestamp']
                 tile = NoteTile(content, key, color, timestamp, title)
@@ -181,7 +182,7 @@ class MainScreen(Screen):
     
     def share_email(self, content):
         try:
-            subject = "Note from My Colorful Notebook"
+            subject = "Note from Q-NOTE"
             body = content
             mailto_url = f"mailto:?subject={quote(subject)}&body={quote(body)}"
             webbrowser.open(mailto_url)

@@ -10,7 +10,7 @@ from kivy.uix.label import Label
 from kivy.uix.filechooser import FileChooserIconView
 from kivy.animation import Animation
 from kivy.metrics import dp
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, StringProperty
 from ui.slide_menu import SlideMenu
 from ui.note_tile import NoteTile
 from utils.storage import NoteStorage
@@ -51,6 +51,9 @@ COLORS = {
 
 class MainScreen(Screen):
     menu = ObjectProperty(None)
+    selected_note_id = StringProperty(None)  # Track selected note ID
+    selected_note_content = StringProperty("")  # Track selected note content
+    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.storage = NoteStorage()
@@ -155,6 +158,10 @@ class MainScreen(Screen):
             self.storage.store.sync()
             self.load_notes()
     
+    def set_selected_note(self, note_id, content):
+        self.selected_note_id = note_id
+        self.selected_note_content = content
+    
     def add_image(self, instance):
         popup = Popup(title="Select Image", size_hint=(0.9, 0.9))
         file_chooser = FileChooserIconView()
@@ -179,10 +186,10 @@ class MainScreen(Screen):
             self.load_notes()
         popup.dismiss()
     
-    def share_email(self, content=""):
+    def share_email(self, instance):
         try:
             subject = "Note from Q-NOTE"
-            body = content or "Check out this note!"
+            body = self.selected_note_content or "No note selected!"
             mailto_url = f"mailto:?subject={quote(subject)}&body={quote(body)}"
             webbrowser.open(mailto_url)
         except Exception as e:

@@ -57,6 +57,9 @@ class NoteTile(BoxLayout):
         if self.options_btn.collide_point(*touch.pos):
             return False
         if self.collide_point(*touch.pos) and touch.button == 'left':
+            # Set selected note in MainScreen
+            self.screen.set_selected_note(self.note_id, self.note_content)
+            # Open note view
             self.screen.manager.get_screen('note_view').set_note(self.note_id, self.note_title, self.note_content)
             self.screen.manager.current = 'note_view'
             return True

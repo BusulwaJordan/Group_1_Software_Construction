@@ -14,7 +14,7 @@ class SlideMenu(BoxLayout):
         
         for text, icon, action in [
             ("Add Image", "image", self.main_screen.add_image),
-            ("Share", "share", lambda x: None),
+            ("Share", "share", self.main_screen.share_email),
             ("Set Reminder", "bell", self.main_screen.set_reminder)
         ]:
             btn = MDButton(

@@ -86,7 +86,7 @@ class MainScreen(Screen):
             hint_text="Search notes...",
             size_hint=(None, None),
             width=dp(200),
-            height=dp(25),  # Reduced from dp(30)
+            height=dp(20),  # Reduced from dp(30)
             mode="outlined",
             pos_hint={'center_x': 0.5},
             on_text=self.filter_notes

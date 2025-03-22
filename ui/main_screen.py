@@ -18,6 +18,8 @@ import random
 import os
 import webbrowser
 from urllib.parse import quote
+from kivy.clock import Clock
+from datetime import times
 
 COLORS = {
     "Coral": '#FF6F61',
@@ -152,6 +154,64 @@ class MainScreen(Screen):
             self.storage.store[key] = data
             self.storage.store.sync()
             self.load_notes()
+    
+    def add_image(self, instance):
+        popup = Popup(title="Select Image", size_hint=(0.9, 0.9))
+        file_chooser = FileChooserIconView()
+        select_btn = MDIconButton(
+            icon="check",
+            size_hint_y=None,
+            height=dp(50),
+            md_bg_color=COLORS["Light Steel Blue"],
+            on_press=lambda x: self.embed_image(file_chooser.selection, popup)
+        )
+        layout = BoxLayout(orientation='vertical')
+        layout.add_widget(file_chooser)
+        layout.add_widget(select_btn)
+        popup.content = layout
+        popup.open()
+
+    def embed_image(self, selection, popup):
+        if selection:
+            img_path = selection[0]
+            note_id = str(time.time())
+            self.storage.save_note(note_id, f"Image: {img_path}", random.choice(list(COLORS.values())), title="Image Note")
+            self.load_notes()
+        popup.dismiss()
+    
+    def share_email(self, content=""):
+        try:
+            subject = "Note from Q-NOTE"
+            body = content or "Check out this note!"
+            mailto_url = f"mailto:?subject={quote(subject)}&body={quote(body)}"
+            webbrowser.open(mailto_url)
+        except Exception as e:
+            Popup(title="Error", content=Label(text=f"Failed to share: {e}"), size_hint=(0.8, 0.4)).open()
+
+    def set_reminder(self, instance):
+        popup = Popup(title="Set Reminder", size_hint=(0.8, 0.4))
+        layout = BoxLayout(orientation='vertical')
+        from kivy.uix.textinput import TextInput
+        time_input = TextInput(hint_text="Time in minutes")
+        set_btn = MDIconButton(
+            icon="check",
+            md_bg_color=COLORS["Fern Green"],
+            on_press=lambda x: self.schedule_reminder(time_input.text, popup)
+        )
+        layout.add_widget(time_input)
+        layout.add_widget(set_btn)
+        popup.content = layout
+        popup.open()
+    
+    def schedule_reminder(self, minutes, popup):
+        try:
+            Clock.schedule_once(lambda dt: self.show_reminder_popup(), float(minutes) * 60)
+            popup.dismiss()
+        except ValueError:
+            Popup(title="Error", content=Label(text="Invalid time input"), size_hint=(0.8, 0.4)).open()
+    
+    def show_reminder_popup(self):
+        Popup(title="Reminder!", content=Label(text="Time's up!"), size_hint=(0.5, 0.3)).open()
     
     def go_to_note_input(self, instance):
         self.manager.current = 'note_input'

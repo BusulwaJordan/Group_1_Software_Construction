@@ -58,7 +58,7 @@ class MainScreen(Screen):
             hint_text="Search notes...",
             size_hint=(None, None),
             width=dp(200),
-            height=dp(25),
+            height=dp(20),
             mode="outlined",
             pos_hint={'center_x': 0.5},
             on_text=self.filter_notes
@@ -124,7 +124,7 @@ class MainScreen(Screen):
         for key in sorted(self.storage.store, key=lambda x: self.storage.store.get(x)['timestamp'], reverse=True):
             data = self.storage.store.get(key)
             content = data['content']
-            title = data.get('title', 'Untitled')
+            title = data.get('title')
             if not search_query or search_query.lower() in title.lower():
                 color = data.get('color', random.choice(list(COLORS.values())))
                 timestamp = data['timestamp']
